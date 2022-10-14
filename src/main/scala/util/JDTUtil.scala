@@ -1,6 +1,7 @@
 package edu.fudan.selab
 package util
 
+import edu.fudan.selab.config.Global
 import org.eclipse.jdt.core.JavaCore
 import org.eclipse.jdt.core.dom.{AST, ASTParser, CompilationUnit}
 
@@ -58,16 +59,32 @@ object JDTUtil {
    * @return
    */
   def getNonPrivateMethodName(cu: CompilationUnit): Array[String] = {
-    val packageName = cu.getPackage.getName.toString
+    val packageDecl = cu.getPackage
+    if packageDecl == null then
+      Global.LOG.warn("cu has no package name")
+      return Array.empty[String]
+
+    val packageName = packageDecl.getName.toString
     val visitor = new DeclarationVisitor()
     cu.accept(visitor)
 
-    visitor.types.map(t => {
+    if visitor.types.isEmpty then
+      Global.LOG.warn("cu has 0 types. (maybe annotation declaration)")
+      return Array.empty[String]
+
+    val r1 = visitor.types.map(t => {
       val className = ClassUtil.getClassName(t)
       t.getMethods.map(m => {
         val methodName = MethodUtil.getShortMethodSig(m)
         MethodUtil.getFullyMethodSig(packageName, className, methodName)
       })
-    }).reduce((prev: Array[String], curr: Array[String]) => prev.appendedAll(curr))
+    }).filter(elem => !elem.isEmpty)
+
+    if r1.isEmpty then
+      Global.LOG.warn("type declarations in cu have no method")
+      return Array.empty[String]
+
+    val r2 = r1.reduce((prev: Array[String], curr: Array[String]) => prev.appendedAll(curr))
+    r2
   }
 }
