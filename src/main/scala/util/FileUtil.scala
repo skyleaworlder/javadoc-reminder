@@ -11,6 +11,14 @@ object FileUtil {
    * @param path
    * @return
    */
+  def getAllEntryPointsOfProject(path: String): Array[String] =
+    getAllEntryPointsOfProject(new File(path))
+
+  /**
+   * get all entry points(non-private method) of a given folder
+   * @param path
+   * @return
+   */
   def getAllEntryPointsOfProject(path: File): Array[String] =
     val files = getAllJavaFiles(path)
     files.map(file => {

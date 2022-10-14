@@ -30,11 +30,17 @@ object SootUtil {
     Options.v().set_app(true)
   }
 
-  def getCallGraph(jarPath: Array[String], methods: Array[String]): CallGraph = {
-    prepare(jarPath)
-    val classPath = Options.v().soot_classpath()
-    println(Options.v().whole_program())
-    println(Options.v().verbose())
+  /**
+   * getCallGraph must be called after prepare invoked !!!
+   * @param methods
+   * @return
+   */
+  def getCallGraph(methods: Array[String]): CallGraph = {
+    assert(Options.v().soot_classpath() != "")
+    assert(Options.v().process_dir() != null)
+    assert(Options.v().whole_program())
+    assert(Options.v().allow_phantom_refs())
+    assert(Options.v().verbose())
 
     val m = ClassUtil.makeClassMethodMap(methods)
     println(m)
@@ -90,7 +96,6 @@ object SootUtil {
    */
   def getMethodsMap(sootClass: SootClass): Map[String, SootMethod] = {
     val m = mutable.Map[String, SootMethod]()
-    print(sootClass.getMethods.size())
     sootClass.getMethods.forEach(method => m.addOne(method.getName, method))
     m
   }
