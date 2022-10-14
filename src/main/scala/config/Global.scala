@@ -51,12 +51,15 @@ object Global {
         val fullyClassName = ClassUtil.getFullyClassName(packageName, className)
 
         // TODO: 这样好吗，目前没有考虑 “没有方法的类”
+        // TODO: 目前生成 cg 靠的是 CLASS_DECL_MAP，这会有隐患吗？cg 需要的 classes 和这里想表示的是同一个含义吗？
+        //  而且目前也是依靠 cg 读取的是 CLASS_DECL_MAP 而非 CLASS_METHOD_MAP，
+        //  才使得 METHOD_DECL_MAP 能够使用 fully name 而非 sig 来做 key
         if td.getMethods.length > 0 then putClassDeclMap(fullyClassName, td)
         else Global.LOG.warn(s"${fullyClassName} has 0 method")
 
         td.getMethods.foreach(md => {
           val fullyMethodName = MethodUtil.getFullyMethodName(
-            packageName, className, MethodUtil.getShortMethodSig(md))
+            packageName, className, md.getName.toString)
           putMethodDeclMap(fullyMethodName, md)
         })
       }) })
@@ -67,7 +70,7 @@ object Global {
     setClassMethodMap(m = classMethodMap.toMap)
     // call-graph
     SootUtil.prepare(jarPath)
-    NEW_CG = SootUtil.getCallGraph(classMethodMap)
+    NEW_CG = SootUtil.getCallGraph(CLASS_DECL_MAP.keySet.toArray)
     // hierarchy
     // must be called after Soot prepare
     NEW_HIERARCHY = Scene.v().getActiveHierarchy

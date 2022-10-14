@@ -32,26 +32,17 @@ object SootUtil {
 
   /**
    * getCallGraph must be called after prepare invoked !!!
-   * @param methods all methods' name
+   * @param classes
    * @return
    */
-  def getCallGraph(methods: Array[String]): CallGraph =
-    val m = ClassUtil.makeClassMethodMap(methods)
-    getCallGraph(m)
-
-  /**
-   * getCallGraph must be called after prepare invoked !!!
-   * @param m class -> methods map
-   * @return
-   */
-  def getCallGraph(m: mutable.Map[String, util.List[String]]): CallGraph =
+  def getCallGraph(classes: Array[String]): CallGraph =
     assert(Options.v().soot_classpath() != "")
     assert(Options.v().process_dir() != null)
     assert(Options.v().whole_program())
     assert(Options.v().allow_phantom_refs())
     assert(Options.v().verbose())
 
-    val entryPoints = loadEntryPoints(m.keySet.toList.toArray)
+    val entryPoints = loadEntryPoints(classes)
     //println(entryPoints.mkString("Array(", ", ", ")"))
     Scene.v().setEntryPoints(entryPoints.toList.asJava)
     Scene.v().loadNecessaryClasses()
