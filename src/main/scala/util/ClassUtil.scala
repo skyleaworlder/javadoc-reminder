@@ -12,6 +12,11 @@ import scala.util.control.Breaks.{break, breakable}
  * thanks Dr.Huang
  */
 object ClassUtil {
+  def getFullyClassName(
+                         packageName: String,
+                         className: String
+                       ): String = s"${packageName}.${className}"
+
   /**
    * get class name by td (not including packageName)
    * @param typeDeclaration

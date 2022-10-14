@@ -6,7 +6,7 @@ import soot.{G, Scene, SootClass, SootMethod}
 import soot.jimple.toolkits.callgraph.{CHATransformer, CallGraph}
 import soot.options.Options
 
-import java.util.ArrayList
+import java.util
 import scala.collection.mutable
 import scala.collection.mutable.Map
 import scala.jdk.CollectionConverters.*
@@ -32,18 +32,25 @@ object SootUtil {
 
   /**
    * getCallGraph must be called after prepare invoked !!!
-   * @param methods
+   * @param methods all methods' name
    * @return
    */
-  def getCallGraph(methods: Array[String]): CallGraph = {
+  def getCallGraph(methods: Array[String]): CallGraph =
+    val m = ClassUtil.makeClassMethodMap(methods)
+    getCallGraph(m)
+
+  /**
+   * getCallGraph must be called after prepare invoked !!!
+   * @param m class -> methods map
+   * @return
+   */
+  def getCallGraph(m: mutable.Map[String, util.List[String]]): CallGraph =
     assert(Options.v().soot_classpath() != "")
     assert(Options.v().process_dir() != null)
     assert(Options.v().whole_program())
     assert(Options.v().allow_phantom_refs())
     assert(Options.v().verbose())
 
-    val m = ClassUtil.makeClassMethodMap(methods)
-    println(m)
     val entryPoints = loadEntryPoints(m.keySet.toList.toArray)
     //println(entryPoints.mkString("Array(", ", ", ")"))
     Scene.v().setEntryPoints(entryPoints.toList.asJava)
@@ -51,19 +58,16 @@ object SootUtil {
     Scene.v().loadBasicClasses()
     CHATransformer.v().transform()
     Scene.v().getCallGraph
-  }
 
   /**
    * get all public methods of given classes
    * @param classNames
    * @return all public methods as entries
    */
-  def loadEntryPoints(classNames: Array[String]): Array[SootMethod] = {
-    val size = classNames.length
-    var entryPoints = Array[SootMethod]()
-    classNames.foreach(className => entryPoints = entryPoints.appendedAll(loadEntryPoints(className)))
-    entryPoints
-  }
+  def loadEntryPoints(classNames: Array[String]): Array[SootMethod] =
+    classNames
+      .map(loadEntryPoints)
+      .reduce((prev: Array[SootMethod], curr: Array[SootMethod]) => prev.appendedAll(curr))
 
   /**
    * get all public methods of given class
@@ -76,6 +80,7 @@ object SootUtil {
     val sootClass = Scene.v().loadClassAndSupport(className)
     sootClass.setApplicationClass()
     Scene.v().loadNecessaryClasses()
+    Global.SOOT_CLASS_MAP += (sootClass.getName, sootClass)
 
     val methodsMap = getMethodsMap(sootClass)
     methodsMap.foreach((_, method: SootMethod) => {
@@ -85,6 +90,7 @@ object SootUtil {
           case _: RuntimeException =>
             Global.LOG.info(s"${className}.${method.getName} is an abstract method with empty body")
         entryPoints = entryPoints :+ method
+        Global.SOOT_METHOD_MAP += (s"${className}.${method.getName}", method)
       end if
     })
     entryPoints

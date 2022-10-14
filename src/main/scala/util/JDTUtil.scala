@@ -54,6 +54,38 @@ object JDTUtil {
   }
 
   /**
+   * judge if a compilation unit has package definition
+   * (some java source file don't have "package A.B.C;")
+   * @param cu
+   * @return true: has; false: doesn't have
+   */
+  def isCuHasPackageDecl(cu: CompilationUnit): Boolean =
+    if cu.getPackage != null then true
+    else { Global.LOG.warn("cu has no package name"); false }
+
+  /**
+   * visit cu to get enough metadata of source file
+   * including types and enums (now only types used)
+   * @param cu
+   * @return visitor contains types and enums
+   */
+  def visitCu(cu: CompilationUnit): DeclarationVisitor =
+    val visitor = new DeclarationVisitor()
+    cu.accept(visitor)
+    visitor
+
+  /**
+   * judge if a java sourcec file has type declaration
+   * (some source file only define annotation)
+   * TODO: Interface need taken into account
+   * @param visitor
+   * @return true: has; false: doesn't have
+   */
+  def isCuHasTypeDecl(visitor: DeclarationVisitor): Boolean =
+    if !visitor.types.isEmpty then true
+    else { Global.LOG.warn("cu has 0 types. (maybe annotation declaration)"); false }
+
+  /**
    * get all non-private methods' name as entry points of call-graph
    * @param cu
    * @return

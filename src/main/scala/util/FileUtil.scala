@@ -1,9 +1,14 @@
 package edu.fudan.selab
 package util
 
-import java.io.File
 
+import org.eclipse.jdt.core.dom.CompilationUnit
+
+import java.io.File
 import scala.util.matching.Regex
+import scalaz.Scalaz.*
+
+import scala.language.postfixOps
 
 object FileUtil {
   /**
@@ -12,7 +17,7 @@ object FileUtil {
    * @return
    */
   def getAllEntryPointsOfProject(path: String): Array[String] =
-    getAllEntryPointsOfProject(new File(path))
+    new File(path) |> getAllEntryPointsOfProject
 
   /**
    * get all entry points(non-private method) of a given folder
@@ -20,12 +25,27 @@ object FileUtil {
    * @return
    */
   def getAllEntryPointsOfProject(path: File): Array[String] =
-    val files = getAllJavaFiles(path)
-    files.map(file => {
-      val cu = JDTUtil.getCompilationUnit(file)
-      val nonPrivateMethodName = JDTUtil.getNonPrivateMethodName(cu)
-      nonPrivateMethodName
-    }).reduce((prev: Array[String], curr: Array[String]) => prev.appendedAll(curr))
+    path |> getAllJavaFiles |> getAllEntryPoints
+
+  /**
+   * get all entry points(non-private method) of given files
+   * @param files java files array
+   * @return
+   */
+  def getAllEntryPoints(files: Array[File]): Array[String] =
+    files.map(JDTUtil.getCompilationUnit)
+      .map(JDTUtil.getNonPrivateMethodName)
+      .reduce((prev: Array[String], curr: Array[String]) => prev.appendedAll(curr))
+
+  /**
+   * get all java source files under path
+   * ^     \\w    \\.java  $
+   * beg any char  . java end
+   * @param path
+   * @return
+   */
+  def getAllJavaFiles(path: String): Array[File] =
+    new File(path) |> getAllJavaFiles
 
   /**
    * get all java source files under path
@@ -50,4 +70,16 @@ object FileUtil {
         qualifiedFiles = qualifiedFiles.appendedAll(getAllFiles(file, regex))
     })
     qualifiedFiles
+
+  /**
+   * get all cu of a given folder or a file
+   * File => Array with 1 element
+   * Dir => Array with all cu under this Dir
+   * @param path
+   * @return
+   */
+  def getAllCompilationUnit(path: File): Array[CompilationUnit] =
+    if path.isFile then Array[CompilationUnit](JDTUtil.getCompilationUnit(path))
+    else getAllJavaFiles(path).map(JDTUtil.getCompilationUnit)
+
 }

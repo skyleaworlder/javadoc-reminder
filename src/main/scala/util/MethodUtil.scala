@@ -11,11 +11,17 @@ import scala.util.control.Breaks.{break, breakable}
  * thanks Dr.Huang
  */
 object MethodUtil {
+  def getFullyMethodName(
+                          packageName: String,
+                          className: String,
+                          methodName: String
+                        ) = s"${packageName}.${className}.${methodName}"
+
   def getFullyMethodSig(
                          packageName: String,
                          className: String,
-                         methodName: String
-                       ) = packageName + "." + className + "." + methodName
+                         shortMethodSig: String
+                       ) = s"${packageName}.${className}.${shortMethodSig}"
 
   def getShortMethodSig(m: MethodDeclaration): String =
     val name = m.getName.toString()

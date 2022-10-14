@@ -23,3 +23,6 @@ libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.19.0"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.19.0"
 // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
 libraryDependencies += "org.slf4j" % "slf4j-simple" % "2.0.3"
+
+// for pipeline operator
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.3.6"
