@@ -1,16 +1,16 @@
 package edu.fudan.selab
-package util
+package util.file
 
+import util.JDTUtil
 
 import org.eclipse.jdt.core.dom.CompilationUnit
 
 import java.io.File
 import scala.util.matching.Regex
+import scala.language.postfixOps
 import scalaz.Scalaz.*
 
-import scala.language.postfixOps
-
-object FileUtil {
+object RetrieveUtil {
   /**
    * get all entry points(non-private method) of a given folder
    * @param path
@@ -55,19 +55,24 @@ object FileUtil {
    * @return
    */
   def getAllJavaFiles(path: File): Array[File] =
-    getAllFiles(path, regex = "^\\w+\\.java$".r)
+    getAllFilesMatchPattern(path, regex = "^\\w+\\.java$".r)
 
-  def getAllFiles(path: File, regex: Regex): Array[File] =
-    var qualifiedFiles = Array.empty[File]
+  /**
+   * get all files satisfy given regex
+   * @param path
+   * @param regex
+   * @return
+   */
+  def getAllFilesMatchPattern(path: File, regex: Regex): Array[File] =
     if path.isFile then return Array.empty[File]
-
+    var qualifiedFiles = Array.empty[File]
     path.listFiles().foreach(file => {
       if file.isFile then
         regex.findFirstMatchIn(file.getName) match
           case Some(f) => qualifiedFiles = qualifiedFiles :+ file
           case None => {}
       else if file.isDirectory then
-        qualifiedFiles = qualifiedFiles.appendedAll(getAllFiles(file, regex))
+        qualifiedFiles = qualifiedFiles.appendedAll(getAllFilesMatchPattern(file, regex))
     })
     qualifiedFiles
 

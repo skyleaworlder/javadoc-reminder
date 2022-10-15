@@ -1,7 +1,8 @@
 package edu.fudan.selab
 package config
 
-import edu.fudan.selab.util.{ClassUtil, FileUtil, JDTUtil, MethodUtil, SootUtil}
+import edu.fudan.selab.util.file.RetrieveUtil
+import edu.fudan.selab.util.{ClassUtil, JDTUtil, MethodUtil, SootUtil}
 import org.eclipse.jdt.core.dom.{MethodDeclaration, TypeDeclaration}
 import org.slf4j.{Logger, LoggerFactory}
 import soot.{Hierarchy, Scene, SootClass, SootMethod}
@@ -40,7 +41,7 @@ object Global {
           ): Unit =
     // class name -> td
     // method name -> td
-    FileUtil.getAllJavaFiles(projPath)
+    RetrieveUtil.getAllJavaFiles(projPath)
       .map(JDTUtil.getCompilationUnit)
       .filter(JDTUtil.isCuHasPackageDecl)
       .map(JDTUtil.visitCu)
