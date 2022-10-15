@@ -18,6 +18,10 @@ libraryDependencies += "org.soot-oss" % "soot" % "4.2.1"
 // https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core
 libraryDependencies += "org.eclipse.jdt" % "org.eclipse.jdt.core" % "3.31.0"
 
+// jgit
+// https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
+libraryDependencies += "org.eclipse.jgit" % "org.eclipse.jgit" % "6.3.0.202209071007-r"
+
 // log
 libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.19.0"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.19.0"

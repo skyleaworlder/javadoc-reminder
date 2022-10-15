@@ -1,6 +1,7 @@
 package edu.fudan.selab
 package config
 
+import edu.fudan.selab.service.GitHelper
 import edu.fudan.selab.util.file.RetrieveUtil
 import edu.fudan.selab.util.{ClassUtil, JDTUtil, MethodUtil, SootUtil}
 import org.eclipse.jdt.core.dom.{MethodDeclaration, TypeDeclaration}
@@ -8,6 +9,8 @@ import org.slf4j.{Logger, LoggerFactory}
 import soot.{Hierarchy, Scene, SootClass, SootMethod}
 import soot.jimple.toolkits.callgraph.CallGraph
 
+import java.io.File
+import java.nio.file.Path
 import java.util
 import scala.jdk.CollectionConverters.*
 
@@ -35,9 +38,13 @@ object Global {
   // method sig -> md
   var METHOD_DECL_MAP: Map[String, MethodDeclaration] = Map.empty
 
+  // old version files Path which contain diff
+  var OLD_VERSION_DIFF_FILES: Map[Path, Path] = Map.empty
+
   def init(
             jarPath: Array[String],
-            projPath: String
+            projPath: String,
+            tmpPath: String
           ): Unit =
     // class name -> td
     // method name -> td
@@ -69,12 +76,17 @@ object Global {
     val methods = METHOD_DECL_MAP.keySet.toArray
     val classMethodMap = ClassUtil.makeClassMethodMap(methods)
     setClassMethodMap(m = classMethodMap.toMap)
+    // old version files contain diff with new version
+    val helper = new GitHelper(projPath + File.separator + ".git", tmpPath)
+    val res = helper.initNonCommittedEnv()
+    res.foreach((oldPath, newPath) => OLD_VERSION_DIFF_FILES += (oldPath -> newPath))
     // call-graph
     SootUtil.prepare(jarPath)
     NEW_CG = SootUtil.getCallGraph(CLASS_DECL_MAP.keySet.toArray)
     // hierarchy
     // must be called after Soot prepare
     NEW_HIERARCHY = Scene.v().getActiveHierarchy
+    println("Initialization finished")
 
   private def setClassMethodMap(m: Map[String, util.List[String]]): Unit =
     NEW_CLASSMETHOD_MAP = Map.from(m)
