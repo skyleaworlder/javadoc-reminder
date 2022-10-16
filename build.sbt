@@ -14,6 +14,14 @@ libraryDependencies += "junit" % "junit" % "4.13.2" % Test
 // https://mvnrepository.com/artifact/org.soot-oss/soot
 libraryDependencies += "org.soot-oss" % "soot" % "4.2.1"
 
+// gumtree
+// https://mvnrepository.com/artifact/com.github.gumtreediff/core
+libraryDependencies += "com.github.gumtreediff" % "core" % "3.0.0" % "runtime"
+// https://mvnrepository.com/artifact/com.github.gumtreediff/client
+libraryDependencies += "com.github.gumtreediff" % "client" % "3.0.0"
+// https://mvnrepository.com/artifact/com.github.gumtreediff/gen.javaparser
+libraryDependencies += "com.github.gumtreediff" % "gen.javaparser" % "3.0.0"
+
 // jdt
 // https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core
 libraryDependencies += "org.eclipse.jdt" % "org.eclipse.jdt.core" % "3.31.0"
