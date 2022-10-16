@@ -23,7 +23,7 @@ class GitHelper(
                 private val tmpFileDir: String
                ) {
   val repository: Repository = RepositoryBuilder()
-    .setGitDir(new File(repoPath))
+    .setGitDir(new File(repoPath + File.separator + ".git"))
     .readEnvironment()
     .findGitDir()
     .build()

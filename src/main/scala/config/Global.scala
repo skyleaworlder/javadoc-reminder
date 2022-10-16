@@ -77,7 +77,7 @@ object Global {
     val classMethodMap = ClassUtil.makeClassMethodMap(methods)
     setClassMethodMap(m = classMethodMap.toMap)
     // old version files contain diff with new version
-    val helper = new GitHelper(projPath + File.separator + ".git", tmpPath)
+    val helper = new GitHelper(projPath, tmpPath)
     val res = helper.initNonCommittedEnv()
     res.foreach((oldPath, newPath) => OLD_VERSION_DIFF_FILES += (oldPath -> newPath))
     // call-graph
