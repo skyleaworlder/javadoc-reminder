@@ -1,7 +1,7 @@
 package edu.fudan.selab
 package util
 
-import com.github.gumtreediff.tree.Tree
+import com.github.gumtreediff.tree.{DefaultTree, Tree}
 import edu.fudan.selab.config.Global
 
 import scala.jdk.CollectionConverters.*
@@ -9,6 +9,7 @@ import scala.jdk.CollectionConverters.*
 object GumTreeUtil {
   val CLASS_OR_INTERFACE_DECLARATION = "ClassOrInterfaceDeclaration"
   val METHOD_DECLARATION = "MethodDeclaration"
+  val NAME = "Name"
   val PACKAGE_DECLARATION = "PackageDeclaration"
   val QUALIFIED_NAME = "QualifiedName"
   val SIMPLE_NAME = "SimpleName"
@@ -36,6 +37,15 @@ object GumTreeUtil {
   def getRoot(tree: Tree): Option[Tree] = tree.getParents.asScala.lastOption
 
   /**
+   * check if tree is one of parents for input node
+   * @param tree
+   * @param input
+   * @return
+   */
+  def isChildOf(tree: Tree, input: Tree): Boolean =
+    input.getParents.asScala.contains(tree)
+
+  /**
    * get package qualified name by any tree node
    * @param tree
    * @return Some => package A.B.C; None => this file has no package decl
@@ -54,9 +64,12 @@ object GumTreeUtil {
    * @return
    */
   def getQualifiedNameOfPackageDecl(packageDecl: Tree): Option[String] =
-    val nameNode = packageDecl.getChildren.asScala.toArray
-      .filter(node => node.getType.equals(QUALIFIED_NAME))
-    if nameNode.nonEmpty then Some(nameNode.head.getLabel)
+    val nameNodes = packageDecl.getDescendants.asScala.toArray
+      .filter(node => node.getType.name.equals(NAME))
+      .reverse
+      .map(node => node.getLabel)
+    if nameNodes.nonEmpty then
+      Some(nameNodes.reduce((prev: String, curr: String) => s"$prev.$curr"))
     else None
 
   /**
@@ -94,8 +107,9 @@ object GumTreeUtil {
     if !clsDeclNode.getType.name.equals(CLASS_OR_INTERFACE_DECLARATION) then
       Global.LOG.warn("GumTreeUtil.getClassName param is not ClassOrInterfaceDeclaration node")
       return null
-    val nameNode = clsDeclNode.getChild(SIMPLE_NAME)
-    if nameNode != null then nameNode.getLabel
+    val nameNode = clsDeclNode.getChildren.asScala
+      .filter(node => node.getType.name.equals(SIMPLE_NAME))
+    if nameNode.nonEmpty then nameNode.head.getLabel
     else null
 
   /**
@@ -113,6 +127,15 @@ object GumTreeUtil {
     else null
 
   /**
+   * check if given node is under a method decl
+   * @param tree
+   * @return
+   */
+  def isUnderAnyMethodDecl(tree: Tree): Boolean =
+    if tree.getType.name.equals(METHOD_DECLARATION) then return true
+    tree.getParents.asScala.exists(node => node.getType.name.equals(METHOD_DECLARATION))
+
+  /**
    * get method decl node of a node:
    * 1. param is already a method decl node
    * 2. param is a node under a method decl node
@@ -121,8 +144,9 @@ object GumTreeUtil {
    * @return Some(Tree) => method decl; None => tree isn't in any method block
    */
   def getMethodDeclNodeFromDown(tree: Tree): Option[Tree] =
-    if tree.getType.name.equals(METHOD_DECLARATION) then return Some(tree)
-    val parents = tree.getParents
-    val methodDeclNodes = parents.asScala.filter(node => node.getType.name.equals(METHOD_DECLARATION))
+    if !isUnderAnyMethodDecl(tree) then return None
+    // add param tree itself, param might be MethodDeclaration
+    val methodDeclNodes = (tree +: tree.getParents.asScala)
+     .filter(node => node.getType.name.equals(METHOD_DECLARATION))
     methodDeclNodes.headOption
 }
