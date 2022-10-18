@@ -12,7 +12,7 @@ object DiffStoreGenerator {
   def makeWorkingDirDiffStore(
                               workingDir: String,
                               tmpDir: String,
-                              newToOldPath: Array[(String, String)]
+                              newToOldPath: Map[String, String]
                              ): WorkingDirDiffStore =
     val store = makeTwoCommitDiffStore(workingDir, tmpDir, newToOldPath)
     new WorkingDirDiffStore(
@@ -21,7 +21,7 @@ object DiffStoreGenerator {
   def makeTwoCommitDiffStore(
                               newDir: String,
                               oldDir: String,
-                              newToOldPath: Array[(String, String)]
+                              newToOldPath: Map[String, String]
                             ): TwoCommitDiffStore =
     // create old file path <-> new file path
     var oldToNew: Map[String, String] = Map.empty

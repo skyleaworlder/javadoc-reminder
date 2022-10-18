@@ -34,7 +34,7 @@ class GitHelper(
   /**
    * init environment for non-commit <-> HEAD compare
    */
-  def initNonCommittedEnv(): Array[(Path, Path)] =
+  def initNonCommittedEnv(): Map[Path, Path] =
     val HEAD = util.getHeadRef
     util.javaSourceDiff.map(entry => {
       val oldPath = entry.getOldPath
@@ -51,6 +51,7 @@ class GitHelper(
         // use .filter(null !=) to remove ADD impact
         case _ => null
     }).filter(null !=)
+      .toMap[Path, Path]
 
   /**
    * init environment for 2 commits compare (perhaps never use)

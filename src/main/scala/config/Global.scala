@@ -39,7 +39,7 @@ object Global {
   var METHOD_DECL_MAP: Map[String, MethodDeclaration] = Map.empty
 
   // old version files Path which contain diff
-  var OLD_VERSION_DIFF_FILES: Map[Path, Path] = Map.empty
+  var NEW_OLD_FILES_MAP: Map[Path, Path] = Map.empty
 
   def init(
             jarPath: Array[String],
@@ -79,7 +79,7 @@ object Global {
     // old version files contain diff with new version
     val helper = new GitHelper(projPath, tmpPath)
     val res = helper.initNonCommittedEnv()
-    res.foreach((oldPath, newPath) => OLD_VERSION_DIFF_FILES += (oldPath -> newPath))
+    res.foreach((newPath, oldPath) => NEW_OLD_FILES_MAP += (newPath -> oldPath))
     // call-graph
     SootUtil.prepare(jarPath)
     NEW_CG = SootUtil.getCallGraph(CLASS_DECL_MAP.keySet.toArray)
