@@ -2,6 +2,7 @@ package edu.fudan.selab
 package util
 
 import edu.fudan.selab.config.Global
+import edu.fudan.selab.visitor.DeclarationVisitor
 import org.eclipse.jdt.core.JavaCore
 import org.eclipse.jdt.core.dom.{AST, ASTParser, CompilationUnit}
 

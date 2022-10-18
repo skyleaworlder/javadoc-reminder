@@ -1,5 +1,5 @@
 package edu.fudan.selab
-package util
+package visitor
 
 import org.eclipse.jdt.core.dom.{ASTVisitor, CompilationUnit, EnumDeclaration, TypeDeclaration}
 
