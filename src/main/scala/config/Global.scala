@@ -23,6 +23,9 @@ object Global {
   // class -> methods
   var NEW_CLASSMETHOD_MAP: Map[String, util.List[String]] = null
 
+  // method name -> overload methods
+  var NEW_OVERLOAD_MAP: Map[String, Array[String]] = null
+
   // call-graph
   var NEW_CG: CallGraph = null
 
@@ -58,16 +61,12 @@ object Global {
         val className = ClassUtil.getClassName(td)
         val fullyClassName = ClassUtil.getFullyClassName(packageName, className)
 
-        // TODO: 这样好吗，目前没有考虑 “没有方法的类”
-        // TODO: 目前生成 cg 靠的是 CLASS_DECL_MAP，这会有隐患吗？cg 需要的 classes 和这里想表示的是同一个含义吗？
-        //  而且目前也是依靠 cg 读取的是 CLASS_DECL_MAP 而非 CLASS_METHOD_MAP，
-        //  才使得 METHOD_DECL_MAP 能够使用 fully name 而非 sig 来做 key
         if td.getMethods.length > 0 then putClassDeclMap(fullyClassName, td)
         else Global.LOG.warn(s"${fullyClassName} has 0 method")
 
         td.getMethods.foreach(md => {
           val fullyMethodName = MethodUtil.getFullyMethodName(
-            packageName, className, md.getName.toString)
+            packageName, className, MethodUtil.getShortMethodSig(md))
           putMethodDeclMap(fullyMethodName, md)
         })
       }) })
@@ -76,10 +75,14 @@ object Global {
     val methods = METHOD_DECL_MAP.keySet.toArray
     val classMethodMap = ClassUtil.makeClassMethodMap(methods)
     setClassMethodMap(m = classMethodMap.toMap)
+
+    // method overload information
+    NEW_OVERLOAD_MAP = MethodUtil.getOverloadMethodMap(METHOD_DECL_MAP.keySet.toArray)
+
     // old version files contain diff with new version
     val helper = new GitHelper(projPath, tmpPath)
-    val res = helper.initNonCommittedEnv()
-    res.foreach((newPath, oldPath) => NEW_OLD_FILES_MAP += (newPath -> oldPath))
+    NEW_OLD_FILES_MAP = helper.initNonCommittedEnv()
+
     // call-graph
     SootUtil.prepare(jarPath)
     NEW_CG = SootUtil.getCallGraph(CLASS_DECL_MAP.keySet.toArray)

@@ -5,6 +5,8 @@ import org.eclipse.jdt.core.dom.{MethodDeclaration, SingleVariableDeclaration}
 
 import java.util.Stack
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
+import scala.language.postfixOps
 import scala.util.control.Breaks.{break, breakable}
 
 /**
@@ -41,6 +43,24 @@ object MethodUtil {
       if iter.hasNext then sb.append(",")
     }
     sb.toString()
+
+  /**
+   * get information about method overload
+   * @param methodNames array of method name
+   * @return key: only method name, no param; val: fully method sig
+   */
+  def getOverloadMethodMap(methodNames: Array[String]): Map[String, Array[String]] =
+    var m = Map.empty[String, mutable.ArrayBuffer[String]]
+    methodNames.foreach(name => {
+      val end = name.indexOf("(")
+      if end != -1 then
+        // get package.class.method name
+        val pcm = name.substring(0, end)
+        if !m.contains(pcm) then
+          m = m.updated(pcm, new ArrayBuffer[String]())
+        m(pcm) += name
+    })
+    m.map(tuple => tuple._1 -> tuple._2.toArray)
 
   /**
    * remove generic "<" and ">"
