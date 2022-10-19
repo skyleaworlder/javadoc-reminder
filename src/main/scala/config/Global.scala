@@ -32,14 +32,26 @@ object Global {
   // class name -> SootClass
   var SOOT_CLASS_MAP: Map[String, SootClass] = Map.empty
 
+  // array version
+  var SOOT_CLASSES: Array[SootClass] = Array.empty
+
   // method name -> SootMethod
   var SOOT_METHOD_MAP: Map[String, SootMethod] = Map.empty
+
+  // array version
+  var SOOT_METHODS: Array[SootMethod] = Array.empty
 
   // class name -> td
   var CLASS_DECL_MAP: Map[String, TypeDeclaration] = Map.empty
 
+  // array version
+  var CLASS_DECLS: Array[TypeDeclaration] = Array.empty
+
   // method sig -> md
   var METHOD_DECL_MAP: Map[String, MethodDeclaration] = Map.empty
+
+  // array version
+  var METHOD_DECLS: Array[MethodDeclaration] = Array.empty
 
   // old version files Path which contain diff
   var NEW_OLD_FILES_MAP: Map[Path, Path] = Map.empty
@@ -65,7 +77,7 @@ object Global {
         else Global.LOG.warn(s"${fullyClassName} has 0 method")
 
         td.getMethods.foreach(md => {
-          val fullyMethodName = MethodUtil.getFullyMethodName(
+          val fullyMethodName = MethodUtil.getFullyMethodSig(
             packageName, className, MethodUtil.getShortMethodSig(md))
           putMethodDeclMap(MethodUtil.fixInit(fullyMethodName), md)
         })
@@ -89,6 +101,13 @@ object Global {
     // hierarchy
     // must be called after Soot prepare
     NEW_HIERARCHY = Scene.v().getActiveHierarchy
+
+    // array version
+    SOOT_CLASSES = SOOT_CLASS_MAP.values.toArray
+    SOOT_METHODS = SOOT_METHOD_MAP.values.toArray
+    CLASS_DECLS = CLASS_DECL_MAP.values.toArray
+    METHOD_DECLS = METHOD_DECL_MAP.values.toArray
+
     println("Initialization finished")
 
   private def setClassMethodMap(m: Map[String, util.List[String]]): Unit =

@@ -62,6 +62,20 @@ object MethodUtil {
       else methodName
 
   /**
+   * replace C(...) => C.<init>(...), if and only if className == C
+   * used in JRClass / JRMethod generation. (because method decl doesn't obtain class information)
+   * @param className
+   * @param methodName
+   * @return
+   */
+  def fixInit(className: String, methodName: String): String =
+    val parts = methodName.split("\\(")
+    if parts.size < 2 then return methodName
+    val shortMethodName = parts.head
+    if className.equals(shortMethodName) then methodName.replace(s"$shortMethodName(", "<init>(")
+    else methodName
+
+  /**
    * get information about method overload
    * @param methodNames array of method name
    * @return key: only method name, no param; val: fully method sig
