@@ -73,9 +73,9 @@ object SootUtil {
     Scene.v().loadNecessaryClasses()
     Global.SOOT_CLASS_MAP += (sootClass.getName, sootClass)
 
-    val methodsMap = getMethodsMap(sootClass)
-    methodsMap.foreach((_, method: SootMethod) => {
-      Global.SOOT_METHOD_MAP += (s"${className}.${MethodTransfer.getNameWithParams(method)}", method)
+    sootClass.getMethods.asScala.foreach((method: SootMethod) => {
+      Global.LOG.info(s"${MethodTransfer.getNameWithParams(method)} -> $method")
+      Global.SOOT_METHOD_MAP += (s"${className}.${MethodTransfer.getNameWithParams(method)}" -> method)
       if !method.isPrivate then
         try method.retrieveActiveBody()
         catch
@@ -85,16 +85,6 @@ object SootUtil {
       end if
     })
     entryPoints
-  }
-
-  /**
-   * @param className
-   * @return key: method's signature; val: SootMethod
-   */
-  def getMethodsMap(sootClass: SootClass): Map[String, SootMethod] = {
-    val m = mutable.Map[String, SootMethod]()
-    sootClass.getMethods.forEach(method => m.addOne(method.getName, method))
-    m
   }
 
   //def recoverGenerics(sootClass: SootClass): SootClass =

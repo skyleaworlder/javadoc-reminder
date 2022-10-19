@@ -28,8 +28,8 @@ object RetrieveUtil {
    */
   def getAllEntryPointsOfProject(path: File, excludeTest: Boolean): Array[String] =
     val neededJavaFiles = {
-      if excludeTest then getAllJavaFiles(path).filter(pruneJavaTestFile)
-      else getAllJavaFiles(path)
+      if excludeTest then getAllJavaFiles(path.getPath).filter(pruneJavaTestFile)
+      else getAllJavaFiles(path.getPath)
     }
     neededJavaFiles |> getAllEntryPoints
 
@@ -121,6 +121,6 @@ object RetrieveUtil {
    */
   def getAllCompilationUnit(path: File): Array[CompilationUnit] =
     if path.isFile then Array[CompilationUnit](JDTUtil.getCompilationUnit(path))
-    else getAllJavaFiles(path).map(JDTUtil.getCompilationUnit)
+    else getAllJavaFiles(path.getPath).map(JDTUtil.getCompilationUnit)
 
 }
