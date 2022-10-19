@@ -26,12 +26,12 @@ object MethodUtil {
                        ) = s"${packageName}.${className}.${shortMethodSig}"
 
   def getShortMethodSig(m: MethodDeclaration): String =
-    val name = m.getName.toString()
+    val name = m.getName.toString
     val params = getParamsList(m)
     removeBracket(name + "(" + params + ")")
 
   def getParamsList(m: MethodDeclaration): String =
-    val sb = new StringBuilder()
+    val sb = new mutable.StringBuilder()
     val params = m.parameters()
     val iter = params.iterator()
     while (iter.hasNext) {

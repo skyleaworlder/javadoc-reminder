@@ -4,6 +4,7 @@ package util.file
 import util.JDTUtil
 
 import org.eclipse.jdt.core.dom.CompilationUnit
+import org.eclipse.jgit.util.StringUtils
 
 import java.io.File
 import scala.util.matching.Regex
@@ -11,21 +12,26 @@ import scala.language.postfixOps
 import scalaz.Scalaz.*
 
 object RetrieveUtil {
+  // about entrypoint
   /**
    * get all entry points(non-private method) of a given folder
    * @param path
    * @return
    */
-  def getAllEntryPointsOfProject(path: String): Array[String] =
-    new File(path) |> getAllEntryPointsOfProject
+  def getAllEntryPointsOfProject(path: String, excludeTest: Boolean = true): Array[String] =
+    getAllEntryPointsOfProject(new File(path), excludeTest)
 
   /**
    * get all entry points(non-private method) of a given folder
    * @param path
    * @return
    */
-  def getAllEntryPointsOfProject(path: File): Array[String] =
-    path |> getAllJavaFiles |> getAllEntryPoints
+  def getAllEntryPointsOfProject(path: File, excludeTest: Boolean): Array[String] =
+    val neededJavaFiles = {
+      if excludeTest then getAllJavaFiles(path).filter(pruneJavaTestFile)
+      else getAllJavaFiles(path)
+    }
+    neededJavaFiles |> getAllEntryPoints
 
   /**
    * get all entry points(non-private method) of given files
@@ -37,6 +43,7 @@ object RetrieveUtil {
       .map(JDTUtil.getNonPrivateMethodName)
       .reduce((prev: Array[String], curr: Array[String]) => prev.appendedAll(curr))
 
+  // load file to get cu
   /**
    * get all java source files under path
    * ^     \\w    \\.java  $
@@ -44,8 +51,8 @@ object RetrieveUtil {
    * @param path
    * @return
    */
-  def getAllJavaFiles(path: String): Array[File] =
-    new File(path) |> getAllJavaFiles
+  def getAllJavaFiles(path: String, excludeTest: Boolean = true): Array[File] =
+    getAllJavaFiles(new File(path), excludeTest)
 
   /**
    * get all java source files under path
@@ -54,8 +61,37 @@ object RetrieveUtil {
    * @param path
    * @return
    */
-  def getAllJavaFiles(path: File): Array[File] =
-    getAllFilesMatchPattern(path, regex = "^\\w+\\.java$".r)
+  def getAllJavaFiles(path: File, excludeTest: Boolean): Array[File] =
+    val res = getAllFilesMatchPattern(path, regex = "^\\w+\\.java$".r)
+    if excludeTest then res.filter(pruneJavaTestFile) else res
+
+  /**
+   * if file name contains "Test.java" => true
+   * else if file is under "src/test" => true
+   * e.g. GlobalTest.java
+   * e.g. src/test/java/edu/fdu/se/callgraph/entryScan/FileUtils.java
+   * @param javaFilePath
+   * @return
+   */
+  def pruneJavaTestFile(javaFilePath: String): Boolean =
+    new File(javaFilePath) |> pruneJavaTestFile
+
+  /**
+   * Usage: .filter(pruneJavaTestFile)
+   *
+   * if file name contains "Test.java" => false
+   * else if file is under "src/test" => false
+   * e.g. GlobalTest.java
+   * e.g. src/test/java/edu/fdu/se/callgraph/entryScan/FileUtils.java
+   * @param javaFile
+   * @return
+   */
+  def pruneJavaTestFile(javaFile: File): Boolean =
+    val fileName: String = javaFile.getName
+    if fileName.contains("Test.java") then
+      return false
+    val absName: String = javaFile.getAbsolutePath
+    !absName.contains(s"src${File.separator}test")
 
   /**
    * get all files satisfy given regex
