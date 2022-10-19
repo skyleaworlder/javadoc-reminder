@@ -67,7 +67,7 @@ object Global {
         td.getMethods.foreach(md => {
           val fullyMethodName = MethodUtil.getFullyMethodName(
             packageName, className, MethodUtil.getShortMethodSig(md))
-          putMethodDeclMap(fullyMethodName, md)
+          putMethodDeclMap(MethodUtil.fixInit(fullyMethodName), md)
         })
       }) })
 

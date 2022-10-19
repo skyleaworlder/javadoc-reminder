@@ -45,6 +45,23 @@ object MethodUtil {
     sb.toString()
 
   /**
+   * replace A.B.C.C(...) => A.B.C.<init>(...)
+   * @param methodName package.class.method(params)
+   * @return if (class == method) package.class.<init>(params)
+   */
+  def fixInit(methodName: String): String =
+    val parts = methodName.split("\\(")
+    if parts.size < 2 then return methodName
+    val packageClassMethod = parts.head
+    val pcmParts = packageClassMethod.split("\\.")
+    if pcmParts.size < 2 then methodName
+    else
+      val className = pcmParts.apply(pcmParts.size - 2)
+      val shortMethodName = pcmParts.last
+      if className.equals(shortMethodName) then methodName.replace(s"$shortMethodName(", "<init>(")
+      else methodName
+
+  /**
    * get information about method overload
    * @param methodNames array of method name
    * @return key: only method name, no param; val: fully method sig

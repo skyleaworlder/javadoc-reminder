@@ -81,7 +81,7 @@ object SootUtil {
           case _: RuntimeException =>
             Global.LOG.info(s"${className}.${method.getName} is an abstract method with empty body")
         entryPoints = entryPoints :+ method
-        Global.SOOT_METHOD_MAP += (s"${className}.${method.getName}", method)
+        Global.SOOT_METHOD_MAP += (s"${className}.${MethodTransfer.getNameWithParams(method)}", method)
       end if
     })
     entryPoints
