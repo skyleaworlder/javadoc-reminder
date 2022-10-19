@@ -75,13 +75,13 @@ object SootUtil {
 
     val methodsMap = getMethodsMap(sootClass)
     methodsMap.foreach((_, method: SootMethod) => {
+      Global.SOOT_METHOD_MAP += (s"${className}.${MethodTransfer.getNameWithParams(method)}", method)
       if !method.isPrivate then
         try method.retrieveActiveBody()
         catch
           case _: RuntimeException =>
             Global.LOG.info(s"${className}.${method.getName} is an abstract method with empty body")
         entryPoints = entryPoints :+ method
-        Global.SOOT_METHOD_MAP += (s"${className}.${MethodTransfer.getNameWithParams(method)}", method)
       end if
     })
     entryPoints
