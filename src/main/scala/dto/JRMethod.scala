@@ -17,12 +17,7 @@ import scala.jdk.CollectionConverters.*
 class JRMethod(
                 val methodDecl: MethodDeclaration,
                 val sootMethod: SootMethod
-              ) {
-  // jdt
-  // javadoc
-  val javadoc: Javadoc = methodDecl.getJavadoc
-  val javadocProps: ChildPropertyDescriptor = methodDecl.getJavadocProperty
-
+              ) extends JRModel(methodDecl) {
   // soot
   // caller: who call this method;
   // callee: which is called by this method.

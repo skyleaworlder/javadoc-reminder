@@ -17,11 +17,12 @@ import scala.jdk.CollectionConverters.*
 class JRClass(
                val classDecl: TypeDeclaration,
                val sootClass: SootClass
-             ) {
+             ) extends JRModel(classDecl) {
   val className: String = classDecl.getName.toString
   val parent: SootClass = sootClass.getSuperclass
   val children: Array[SootClass] = Global.NEW_HIERARCHY.getSubclassesOf(sootClass).asScala.toArray
 
+  // check validity of method decls and soot methods
   private var methodsDecl: Array[MethodDeclaration] = classDecl.getMethods
   private var methodsSoot: Array[SootMethod] = sootClass.getMethods.asScala.toArray
   methodsDecl = methodsDecl.filter(md => {
@@ -51,6 +52,7 @@ class JRClass(
     new JRMethod(md, simpleNameSmMap(name))
   }).toArray
 
+  // checker if method decl number equals constructed JRMethod number
   if methods.length != simpleNameMdMap.size then
     Global.LOG.warn("JRClass.init: filtered md's number not equal JRMethod's number")
 }
