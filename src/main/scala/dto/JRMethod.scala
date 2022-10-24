@@ -2,7 +2,8 @@ package edu.fudan.selab
 package dto
 
 import edu.fudan.selab.config.Global
-import org.eclipse.jdt.core.dom.{ChildPropertyDescriptor, Javadoc, MethodDeclaration}
+import edu.fudan.selab.util.MethodTransfer
+import org.eclipse.jdt.core.dom.{ChildPropertyDescriptor, CompilationUnit, Javadoc, MethodDeclaration, SingleVariableDeclaration}
 import soot.SootMethod
 import soot.jimple.toolkits.callgraph.Edge
 
@@ -27,4 +28,34 @@ class JRMethod(
   var callee: Array[SootMethod] = Global.NEW_CG.edgesInto(sootMethod).asScala.toArray
     .filter(e => e.tgt() == sootMethod)
     .map(e => e.src())
+
+  /**
+   * format: package.class.method(params)
+   * @return
+   */
+  override def getName: String =
+    MethodTransfer.getNameWithParams(sootMethod)
+
+  /**
+   * get parameter's names
+   * @return
+   */
+  def getParamNames: Array[String] =
+    var names: Array[String] = Array.empty
+    val params = methodDecl.parameters()
+    val iter = params.iterator()
+    while (iter.hasNext) {
+      val param = iter.next().asInstanceOf[SingleVariableDeclaration]
+      val paramName = param.getName.toString
+      names = names :+ paramName
+    }
+    names
+
+  /**
+   * get line number of method decl
+   * @return
+   */
+  override def getLineNo: Int =
+    val cu = methodDecl.getRoot.asInstanceOf[CompilationUnit]
+    cu.getLineNumber(methodDecl.getStartPosition) - 1
 }

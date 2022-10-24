@@ -3,7 +3,7 @@ package dto
 
 import edu.fudan.selab.config.Global
 import edu.fudan.selab.util.{MethodTransfer, MethodUtil}
-import org.eclipse.jdt.core.dom.{MethodDeclaration, TypeDeclaration}
+import org.eclipse.jdt.core.dom.{CompilationUnit, MethodDeclaration, TypeDeclaration}
 import soot.{SootClass, SootMethod}
 
 import java.util
@@ -55,4 +55,18 @@ class JRClass(
   // checker if method decl number equals constructed JRMethod number
   if methods.length != simpleNameMdMap.size then
     Global.LOG.warn("JRClass.init: filtered md's number not equal JRMethod's number")
+
+  /**
+   * get name, using SootMethod getName
+   * @return
+   */
+  override def getName: String = sootClass.getName
+
+  /**
+   * get line number of class decl
+   * @return
+   */
+  override def getLineNo: Int =
+    val cu = classDecl.getRoot.asInstanceOf[CompilationUnit]
+    cu.getLineNumber(classDecl.getStartPosition) - 1
 }
