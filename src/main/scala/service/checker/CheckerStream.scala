@@ -1,7 +1,7 @@
 package edu.fudan.selab
 package service.checker
 
-import dto.{BodyType, Record, RecordType, WorkingDirDiffStore}
+import dto.{BodyType, JRClass, JRMethod, Record, RecordType, WorkingDirDiffStore}
 
 import org.eclipse.jdt.core.dom.{MethodDeclaration, TypeDeclaration}
 import soot.SootMethod
@@ -11,14 +11,12 @@ import scala.collection.mutable
 
 class CheckerStream(
                     val diffStore: WorkingDirDiffStore,
-                    val methodOverloadMap: Map[String, Array[String]],
-                    val classDeclMap: Map[String, TypeDeclaration],
-                    val methodDeclMap: Map[String, MethodDeclaration],
-                    val sootMethodMap: Map[String, SootMethod],
+                    val jrClasses: Map[String, JRClass],
+                    val jrMethods: Map[String, JRMethod],
                     val callgraph: CallGraph
                    ) {
   // contains checkers' result
-  var tdRecords = mutable.Map.empty[String, mutable.Map[RecordType, Record]]
+  var classRecords = mutable.Map.empty[String, mutable.Map[RecordType, Record]]
   var methodRecords = mutable.Map.empty[String, mutable.Map[RecordType, Record]]
 
   // checkers will be used
@@ -42,7 +40,7 @@ class CheckerStream(
       records.foreach(record => {
         record.bt match
           case BodyType.CLASS =>
-            tdRecords(record.sig).addOne(record.t, record)
+            classRecords(record.sig).addOne(record.t, record)
           case BodyType.METHOD =>
             methodRecords(record.sig).addOne(record.t, record)
       })
