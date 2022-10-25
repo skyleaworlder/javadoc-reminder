@@ -7,6 +7,18 @@ import scala.jdk.CollectionConverters.*
 
 object MethodTransfer {
   /**
+   * @param packageName
+   * @param className
+   * @param m
+   * @return packageName.className.methodName(params)
+   */
+  def getFullyQualifiedName(packageName: String, className: String, m: SootMethod): String =
+    s"$packageName.$className.${getNameWithParams(m)}"
+
+  def getFullyQualifiedName(pkgClsName: String, m: SootMethod): String =
+    s"$pkgClsName.${getNameWithParams(m)}"
+
+  /**
    * get name by SootMethod
    * @param m
    * @return
