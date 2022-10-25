@@ -40,8 +40,14 @@ class CheckerStream(
       records.foreach(record => {
         record.bt match
           case BodyType.CLASS =>
+            if !classRecords.contains(record.sig) then
+              classRecords.put(record.sig, new mutable.HashMap[RecordType, Record]())
+            end if
             classRecords(record.sig).addOne(record.t, record)
           case BodyType.METHOD =>
+            if !methodRecords.contains(record.sig) then
+              methodRecords.put(record.sig, new mutable.HashMap[RecordType, Record]())
+            end if
             methodRecords(record.sig).addOne(record.t, record)
       })
     })
