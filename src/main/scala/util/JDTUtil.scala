@@ -4,7 +4,7 @@ package util
 import edu.fudan.selab.config.Global
 import edu.fudan.selab.visitor.DeclarationVisitor
 import org.eclipse.jdt.core.JavaCore
-import org.eclipse.jdt.core.dom.{AST, ASTParser, CompilationUnit}
+import org.eclipse.jdt.core.dom.{AST, ASTParser, CompilationUnit, MethodDeclaration, TypeDeclaration}
 
 import java.io.{BufferedReader, File, FileInputStream, FileReader}
 import scala.io.Source
@@ -85,6 +85,24 @@ object JDTUtil {
   def isCuHasTypeDecl(visitor: DeclarationVisitor): Boolean =
     if !visitor.types.isEmpty then true
     else { Global.LOG.warn("cu has 0 types. (maybe annotation declaration)"); false }
+
+  /**
+   * get line number of type decl
+   * @param td
+   * @return line no
+   */
+  def getTypeDeclLineNo(td: TypeDeclaration): Int =
+    val cu = td.getRoot.asInstanceOf[CompilationUnit]
+    cu.getLineNumber(td.getStartPosition) - 1
+
+  /**
+   * get line number of method decl
+   * @param md
+   * @return line no
+   */
+  def getMethodDeclLineNo(md: MethodDeclaration): Int =
+    val cu = md.getRoot.asInstanceOf[CompilationUnit]
+    cu.getLineNumber(md.getStartPosition) - 1
 
   /**
    * get all non-private methods' name as entry points of call-graph

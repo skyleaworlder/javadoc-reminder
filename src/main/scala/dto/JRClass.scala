@@ -2,7 +2,7 @@ package edu.fudan.selab
 package dto
 
 import edu.fudan.selab.config.Global
-import edu.fudan.selab.util.{MethodTransfer, MethodUtil}
+import edu.fudan.selab.util.{JDTUtil, MethodTransfer, MethodUtil}
 import org.eclipse.jdt.core.dom.{CompilationUnit, MethodDeclaration, TypeDeclaration}
 import soot.{SootClass, SootMethod}
 
@@ -66,7 +66,5 @@ class JRClass(
    * get line number of class decl
    * @return
    */
-  override def getLineNo: Int =
-    val cu = classDecl.getRoot.asInstanceOf[CompilationUnit]
-    cu.getLineNumber(classDecl.getStartPosition) - 1
+  override def getLineNo: Int = JDTUtil.getTypeDeclLineNo(classDecl)
 }

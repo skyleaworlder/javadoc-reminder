@@ -2,7 +2,7 @@ package edu.fudan.selab
 package dto
 
 import edu.fudan.selab.config.Global
-import edu.fudan.selab.util.MethodTransfer
+import edu.fudan.selab.util.{JDTUtil, MethodTransfer, MethodUtil}
 import org.eclipse.jdt.core.dom.{ChildPropertyDescriptor, CompilationUnit, Javadoc, MethodDeclaration, SingleVariableDeclaration}
 import soot.SootMethod
 import soot.jimple.toolkits.callgraph.Edge
@@ -55,7 +55,5 @@ class JRMethod(
    * get line number of method decl
    * @return
    */
-  override def getLineNo: Int =
-    val cu = methodDecl.getRoot.asInstanceOf[CompilationUnit]
-    cu.getLineNumber(methodDecl.getStartPosition) - 1
+  override def getLineNo: Int = JDTUtil.getMethodDeclLineNo(methodDecl)
 }
