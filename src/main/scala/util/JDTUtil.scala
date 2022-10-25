@@ -2,6 +2,7 @@ package edu.fudan.selab
 package util
 
 import edu.fudan.selab.config.Global
+import edu.fudan.selab.util.format.JDTMethodFormatter
 import edu.fudan.selab.visitor.DeclarationVisitor
 import org.eclipse.jdt.core.JavaCore
 import org.eclipse.jdt.core.dom.{AST, ASTParser, CompilationUnit, MethodDeclaration, TypeDeclaration}
@@ -126,8 +127,8 @@ object JDTUtil {
     val r1 = visitor.types.map(t => {
       val className = ClassUtil.getClassName(t)
       t.getMethods.map(m => {
-        val methodName = MethodUtil.getShortMethodSig(m)
-        MethodUtil.getFullyMethodSig(packageName, className, methodName)
+        val methodName = JDTMethodFormatter.getShortMethodSig(m)
+        JDTMethodFormatter.getFullyMethodSig(packageName, className, methodName)
       })
     }).filter(elem => !elem.isEmpty)
 

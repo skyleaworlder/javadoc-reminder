@@ -2,7 +2,8 @@ package edu.fudan.selab
 package dto
 
 import edu.fudan.selab.config.Global
-import edu.fudan.selab.util.{JDTUtil, MethodTransfer, MethodUtil}
+import edu.fudan.selab.util.format.{JDTMethodFormatter, SootMethodFormatter}
+import edu.fudan.selab.util.JDTUtil
 import org.eclipse.jdt.core.dom.{ChildPropertyDescriptor, CompilationUnit, Javadoc, MethodDeclaration, SingleVariableDeclaration}
 import soot.SootMethod
 import soot.jimple.toolkits.callgraph.Edge
@@ -34,7 +35,7 @@ class JRMethod(
    * @return
    */
   override def getName: String =
-    MethodTransfer.getNameWithParams(sootMethod)
+    SootMethodFormatter.getNameWithParams(sootMethod)
 
   /**
    * get parameter's names

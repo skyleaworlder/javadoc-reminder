@@ -1,18 +1,32 @@
 package edu.fudan.selab
-package util
+package util.format
 
-import org.eclipse.jdt.core.dom.{MethodDeclaration, SingleVariableDeclaration}
+import util.ClassUtil
+
+import org.eclipse.jdt.core.dom.{CompilationUnit, MethodDeclaration, SingleVariableDeclaration}
 
 import java.util.Stack
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-import scala.language.postfixOps
 import scala.util.control.Breaks.{break, breakable}
 
 /**
  * thanks Dr.Huang
  */
-object MethodUtil {
+object JDTMethodFormatter {
+  /**
+   * packageName.className.methodName(params)
+   *
+   * @param md
+   * @return
+   */
+  def getFullyMethodSig(md: MethodDeclaration): String =
+    val cu = md.getRoot.asInstanceOf[CompilationUnit]
+    val packageName = cu.getPackage.getName.toString
+    val className = ClassUtil.getClassName(ClassUtil.getTypeDecl(md))
+    val shortMethodSig = getShortMethodSig(md)
+    getFullyMethodSig(packageName, className, shortMethodSig)
+
   def getFullyMethodName(
                           packageName: String,
                           className: String,
@@ -46,6 +60,7 @@ object MethodUtil {
 
   /**
    * replace A.B.C.C(...) => A.B.C.<init>(...)
+   *
    * @param methodName package.class.method(params)
    * @return if (class == method) package.class.<init>(params)
    */
@@ -64,6 +79,7 @@ object MethodUtil {
   /**
    * replace C(...) => C.<init>(...), if and only if className == C
    * used in JRClass / JRMethod generation. (because method decl doesn't obtain class information)
+   *
    * @param className
    * @param methodName
    * @return
@@ -77,6 +93,7 @@ object MethodUtil {
 
   /**
    * get information about method overload
+   *
    * @param methodNames array of method name
    * @return key: only method name, no param; val: fully method sig
    */
@@ -95,6 +112,7 @@ object MethodUtil {
 
   /**
    * remove generic "<" and ">"
+   *
    * @param s
    * @return
    */

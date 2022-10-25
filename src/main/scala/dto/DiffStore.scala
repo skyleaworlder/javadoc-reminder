@@ -4,6 +4,7 @@ package dto
 import com.github.gumtreediff.actions.model.Action
 import com.github.gumtreediff.tree.Tree
 import edu.fudan.selab.util.GumTreeUtil
+import edu.fudan.selab.util.format.GumTreeMethodFormatter
 
 import java.io.File
 import scala.jdk.CollectionConverters.*
@@ -46,7 +47,7 @@ class FileDiffMetadata(
     actions.filter(action => GumTreeUtil.isUnderAnyMethodDecl(action.getNode))
       .map(action => GumTreeUtil.getMethodDeclNodeFromDown(action.getNode))
       .filter(None !=).map(oMethodDecl => oMethodDecl.get)
-      .map(methodDecl => GumTreeUtil.getFullyQualifiedMethodName(methodDecl))
+      .map(methodDecl => GumTreeMethodFormatter.getFullyQualifiedMethodName(methodDecl))
       .filter(None !=).map(oName => oName.get)
       .distinct
 }

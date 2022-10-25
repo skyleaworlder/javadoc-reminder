@@ -2,7 +2,8 @@ package edu.fudan.selab
 package dto
 
 import edu.fudan.selab.config.Global
-import edu.fudan.selab.util.{JDTUtil, MethodTransfer, MethodUtil}
+import edu.fudan.selab.util.format.{JDTMethodFormatter, SootMethodFormatter}
+import edu.fudan.selab.util.JDTUtil
 import org.eclipse.jdt.core.dom.{CompilationUnit, MethodDeclaration, TypeDeclaration}
 import soot.{SootClass, SootMethod}
 
@@ -42,9 +43,9 @@ class JRClass(
 
   // simpleName means: no package, no class, only method name and params (<init> fixed, no <clinit>)
   private val simpleNameMdMap: Map[String, MethodDeclaration] = methodsDecl
-    .map(md => MethodUtil.fixInit(className, MethodUtil.getShortMethodSig(md)) -> md).toMap
+    .map(md => JDTMethodFormatter.fixInit(className, JDTMethodFormatter.getShortMethodSig(md)) -> md).toMap
   private val simpleNameSmMap: Map[String, SootMethod] = methodsSoot
-    .map(sm => MethodTransfer.getNameWithParams(sm) -> sm).toMap
+    .map(sm => SootMethodFormatter.getNameWithParams(sm) -> sm).toMap
 
   // generate JRMethod for each method in class (class decl && soot class)
   val methods: Array[JRMethod] = simpleNameMdMap.map(elem => {

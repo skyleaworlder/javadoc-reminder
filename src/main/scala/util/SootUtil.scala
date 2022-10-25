@@ -2,6 +2,7 @@ package edu.fudan.selab
 package util
 
 import edu.fudan.selab.config.Global
+import edu.fudan.selab.util.format.SootMethodFormatter
 import soot.{G, Scene, SootClass, SootMethod}
 import soot.jimple.toolkits.callgraph.{CHATransformer, CallGraph}
 import soot.options.Options
@@ -74,8 +75,8 @@ object SootUtil {
     Global.SOOT_CLASS_MAP += (sootClass.getName, sootClass)
 
     sootClass.getMethods.asScala.foreach((method: SootMethod) => {
-      Global.LOG.info(s"${MethodTransfer.getNameWithParams(method)} -> $method")
-      Global.SOOT_METHOD_MAP += (s"${className}.${MethodTransfer.getNameWithParams(method)}" -> method)
+      Global.LOG.info(s"${SootMethodFormatter.getNameWithParams(method)} -> $method")
+      Global.SOOT_METHOD_MAP += (s"${className}.${SootMethodFormatter.getNameWithParams(method)}" -> method)
       if !method.isPrivate then
         try method.retrieveActiveBody()
         catch

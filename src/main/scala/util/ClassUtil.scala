@@ -1,7 +1,7 @@
 package edu.fudan.selab
 package util
 
-import org.eclipse.jdt.core.dom.AbstractTypeDeclaration
+import org.eclipse.jdt.core.dom.{ASTNode, AbstractTypeDeclaration, MethodDeclaration}
 import soot.SootClass
 
 import java.util
@@ -36,6 +36,25 @@ object ClassUtil {
       td = td.getParent.asInstanceOf[AbstractTypeDeclaration]
     end while
     sb.toString()
+
+  /**
+   * get a type decl through a given method
+   * if not found, return null
+   *
+   * infinite loop warning
+   * @param md
+   * @return
+   */
+  def getTypeDecl(md: MethodDeclaration): AbstractTypeDeclaration =
+    var current: ASTNode = md
+    while true do
+      current = current.getParent
+      if current == null then
+        return null
+      if !current.isInstanceOf[AbstractTypeDeclaration] then
+        return current.asInstanceOf[AbstractTypeDeclaration]
+    end while
+    current.asInstanceOf[AbstractTypeDeclaration] // fake exit stmt
 
   /**
    * use methods (package+class+fully method) as input,

@@ -1,11 +1,11 @@
 package edu.fudan.selab
-package util
+package util.format
 
 import soot.{SootMethod, Type}
 
 import scala.jdk.CollectionConverters.*
 
-object MethodTransfer {
+object SootMethodFormatter {
   /**
    * @param packageName
    * @param className
@@ -20,6 +20,7 @@ object MethodTransfer {
 
   /**
    * get name by SootMethod
+   *
    * @param m
    * @return
    */
@@ -30,6 +31,7 @@ object MethodTransfer {
 
   /**
    * get params part by SootMethod
+   *
    * @param m
    * @return => "String,Integer,String[]"
    */

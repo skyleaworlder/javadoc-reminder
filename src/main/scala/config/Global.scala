@@ -3,7 +3,8 @@ package config
 
 import edu.fudan.selab.service.GitHelper
 import edu.fudan.selab.util.file.RetrieveUtil
-import edu.fudan.selab.util.{ClassUtil, JDTUtil, MethodUtil, SootUtil}
+import edu.fudan.selab.util.format.JDTMethodFormatter
+import edu.fudan.selab.util.{ClassUtil, JDTUtil, SootUtil}
 import org.eclipse.jdt.core.dom.{MethodDeclaration, TypeDeclaration}
 import org.slf4j.{Logger, LoggerFactory}
 import soot.{Hierarchy, Scene, SootClass, SootMethod}
@@ -77,9 +78,9 @@ object Global {
         else Global.LOG.warn(s"${fullyClassName} has 0 method")
 
         td.getMethods.foreach(md => {
-          val fullyMethodName = MethodUtil.getFullyMethodSig(
-            packageName, className, MethodUtil.getShortMethodSig(md))
-          putMethodDeclMap(MethodUtil.fixInit(fullyMethodName), md)
+          val fullyMethodName = JDTMethodFormatter.getFullyMethodSig(
+            packageName, className, JDTMethodFormatter.getShortMethodSig(md))
+          putMethodDeclMap(JDTMethodFormatter.fixInit(fullyMethodName), md)
         })
       }) })
 
@@ -89,7 +90,7 @@ object Global {
     setClassMethodMap(m = classMethodMap.toMap)
 
     // method overload information
-    NEW_OVERLOAD_MAP = MethodUtil.getOverloadMethodMap(METHOD_DECL_MAP.keySet.toArray)
+    NEW_OVERLOAD_MAP = JDTMethodFormatter.getOverloadMethodMap(METHOD_DECL_MAP.keySet.toArray)
 
     // old version files contain diff with new version
     val helper = new GitHelper(projPath, tmpPath)
