@@ -21,7 +21,7 @@ def main(projPath: String, tmpPath: String, jarPath: String*): Unit = {
     .map(jrm => jrm.getName -> jrm).toMap
 
   val stream = new CheckerStream(
-    diffStore, jrClasses, jrMethods, Global.NEW_CG)
+    diffStore, jrClasses, jrMethods, Global.OLD_CG)
 
   stream
     .use(new JavadocChecker())

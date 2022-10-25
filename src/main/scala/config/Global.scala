@@ -27,7 +27,7 @@ object Global {
   var NEW_OVERLOAD_MAP: Map[String, Array[String]] = null
 
   // call-graph
-  var NEW_CG: CallGraph = null
+  var OLD_CG: CallGraph = null
 
   // class name -> SootClass
   var SOOT_CLASS_MAP: Map[String, SootClass] = Map.empty
@@ -97,7 +97,7 @@ object Global {
 
     // call-graph
     SootUtil.prepare(jarPath)
-    NEW_CG = SootUtil.getCallGraph(CLASS_DECL_MAP.keySet.toArray)
+    OLD_CG = SootUtil.getCallGraph(CLASS_DECL_MAP.keySet.toArray)
     // hierarchy
     // must be called after Soot prepare
     NEW_HIERARCHY = Scene.v().getActiveHierarchy

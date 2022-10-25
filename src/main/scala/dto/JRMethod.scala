@@ -22,12 +22,12 @@ class JRMethod(
   // soot
   // caller: who call this method;
   // callee: which is called by this method.
-  var caller: Array[SootMethod] = Global.NEW_CG.edgesOutOf(sootMethod).asScala.toArray
-    .filter(e => e.src() == sootMethod)
-    .map(e => e.tgt())
-  var callee: Array[SootMethod] = Global.NEW_CG.edgesInto(sootMethod).asScala.toArray
+  var caller: Array[SootMethod] = Global.OLD_CG.edgesInto(sootMethod).asScala.toArray
     .filter(e => e.tgt() == sootMethod)
     .map(e => e.src())
+  var callee: Array[SootMethod] = Global.OLD_CG.edgesOutOf(sootMethod).asScala.toArray
+    .filter(e => e.src() == sootMethod)
+    .map(e => e.tgt())
 
   /**
    * format: package.class.method(params)
