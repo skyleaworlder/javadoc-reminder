@@ -51,7 +51,7 @@ object ClassUtil {
       current = current.getParent
       if current == null then
         return null
-      if !current.isInstanceOf[AbstractTypeDeclaration] then
+      if current.isInstanceOf[AbstractTypeDeclaration] then
         return current.asInstanceOf[AbstractTypeDeclaration]
     end while
     current.asInstanceOf[AbstractTypeDeclaration] // fake exit stmt

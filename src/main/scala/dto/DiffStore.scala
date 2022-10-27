@@ -3,8 +3,10 @@ package dto
 
 import com.github.gumtreediff.actions.model.Action
 import com.github.gumtreediff.tree.Tree
-import edu.fudan.selab.util.GumTreeUtil
-import edu.fudan.selab.util.format.GumTreeMethodFormatter
+import edu.fudan.selab.util.{GumTreeUtil, JDTUtil}
+import edu.fudan.selab.util.format.{GumTreeMethodFormatter, JDTMethodFormatter}
+import edu.fudan.selab.visitor.DeclarationVisitor
+import org.eclipse.jdt.core.dom.{CompilationUnit, MethodDeclaration, TypeDeclaration}
 
 import java.io.File
 import scala.jdk.CollectionConverters.*
@@ -17,7 +19,30 @@ abstract class DiffStore(
 
   // file path -> File
   var fileMap: Map[String, FileDiffMetadata] = Map.empty
-)
+) {
+  private val oldFileMap = fileMap.filter(elem => oldToNew.keySet.contains(elem._1))
+  private val newFileMap = fileMap.filter(elem => newToOld.keySet.contains(elem._1))
+
+  // old file method name -> decl map
+  val oldFileMethodMap: Map[String, MethodDeclaration] = oldFileMap.values
+    .map(diffData => diffData.mds)
+    .reduce((prev, curr) => prev.appendedAll(curr))
+    .map(md => JDTMethodFormatter.getFullyMethodSig(md) -> md)
+    .toMap
+  // new file method name -> decl map
+  val newFileMethodMap: Map[String, MethodDeclaration] = newFileMap.values
+    .map(diffData => diffData.mds)
+    .reduce((prev, curr) => prev.appendedAll(curr))
+    .map(md => JDTMethodFormatter.getFullyMethodSig(md) -> md)
+    .toMap
+
+  // created method -> decl map
+  val insertMethodMap: Map[String, MethodDeclaration] = newFileMethodMap
+    .filter(elem => newFileMethodMap.contains(elem._1) && !oldFileMethodMap.contains(elem._1))
+  // deleted method -> decl map
+  val deleteMethodMap: Map[String, MethodDeclaration] = oldFileMethodMap
+    .filter(elem => oldFileMethodMap.contains(elem._1) && !newFileMethodMap.contains(elem._1))
+}
 
 
 /**
@@ -43,6 +68,15 @@ class FileDiffMetadata(
                         val root: Tree,
                         val actions: Array[Action]
                       ) {
+  val cu: CompilationUnit = JDTUtil.getCompilationUnit(file)
+  private val visitor = new DeclarationVisitor()
+  cu.accept(visitor)
+
+  val tds: Array[TypeDeclaration] = visitor.types
+  val mds: Array[MethodDeclaration] = tds
+    .map(td => td.getMethods)
+    .reduce((prev, curr) => prev.appendedAll(curr))
+
   def getAllMethod: Array[String] =
     actions.filter(action => GumTreeUtil.isUnderAnyMethodDecl(action.getNode))
       .map(action => GumTreeUtil.getMethodDeclNodeFromDown(action.getNode))
