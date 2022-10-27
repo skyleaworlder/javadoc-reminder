@@ -1,10 +1,9 @@
 package edu.fudan.selab
 package service.checker
 
-import dto.{BodyType, JRMethod, JavadocRecord, Record, RecordType}
+import dto.{BodyType, JRMethod, JavadocIncompletenessRecord, Record, RecordType}
 
 import edu.fudan.selab.service.checker.JavadocChecker.{getAllParamTagElements, getFragments, getValidTags, makeRecord}
-import edu.fudan.selab.visitor.JavadocVisitor
 import org.eclipse.jdt.core.dom.{Javadoc, MethodDeclaration, SimpleName, SingleVariableDeclaration, TagElement, TextElement, TypeDeclaration}
 import soot.SootMethod
 
@@ -60,8 +59,6 @@ class JavadocChecker extends Checker {
 }
 
 object JavadocChecker {
-  val T: RecordType = RecordType.JAVADOC
-
   /**
    * make a Record using JRMethod
    * @param m
@@ -69,7 +66,7 @@ object JavadocChecker {
    * @return
    */
   def makeRecord(m: JRMethod, msg: String): Record =
-    new JavadocRecord(BodyType.METHOD, m.sootMethod.getSignature, m.getLineNo, msg)
+    new JavadocIncompletenessRecord(m.sootMethod.getSignature, m.getLineNo, msg)
 
   /**
    * get all tags in javadoc

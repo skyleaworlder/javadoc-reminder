@@ -2,7 +2,9 @@ package edu.fudan.selab
 package dto
 
 enum RecordType {
-  case JAVADOC
+  case JAVADOC_INCOMPLETENESS
+  case JAVADOC_NEW_METHOD
+  case JAVADOC_CALL_GRAPH_IMPACT
   case AGE
   case IMPORTANCE
 }
@@ -23,12 +25,32 @@ class Record(
             )
 
 
-class JavadocRecord(
-                     bt: BodyType,
+class JavadocMethodRecord(
+                     t: RecordType,
                      sig: String,
                      line: Int,
                      message: String
-                   ) extends Record(t = RecordType.JAVADOC, bt, sig, line, message)
+                   ) extends Record(t, bt = BodyType.METHOD, sig, line, message)
+
+class JavadocNewMethodRecord(
+                              sig: String,
+                              line: Int,
+                              message: String
+                            ) extends JavadocMethodRecord(t = RecordType.JAVADOC_NEW_METHOD, sig, line, message)
+
+
+class JavadocIncompletenessRecord(
+                                  sig: String,
+                                  line: Int,
+                                  message: String
+                                 ) extends JavadocMethodRecord(t = RecordType.JAVADOC_INCOMPLETENESS, sig, line, message)
+
+
+class JavadocCallGraphImpactRecord(
+                                    sig: String,
+                                    line: Int,
+                                    message: String
+                                  ) extends JavadocMethodRecord(t = RecordType.JAVADOC_CALL_GRAPH_IMPACT, sig, line, message)
 
 
 class AgeRecord(
