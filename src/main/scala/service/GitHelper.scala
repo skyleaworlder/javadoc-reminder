@@ -3,8 +3,9 @@ package service
 
 import edu.fudan.selab.config.Global
 import edu.fudan.selab.util.GitUtil
-import edu.fudan.selab.util.file.RWUtil
+import edu.fudan.selab.util.file.{PathUtil, RWUtil}
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.blame.BlameResult
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.errors.{IncorrectObjectTypeException, MissingObjectException}
 import org.eclipse.jgit.lib.{ObjectId, Ref, Repository, RepositoryBuilder}
@@ -19,7 +20,7 @@ import scala.language.postfixOps
 import scala.util.Using
 
 class GitHelper(
-                private val repoPath: String,
+                val repoPath: String,
                 private val tmpFileDir: String
                ) {
   val repository: Repository = RepositoryBuilder()
@@ -143,4 +144,13 @@ class GitHelper(
         e.printStackTrace()
     } finally { if walk != null then walk.close() }
     commit
+
+  /**
+   * get blame result by absolute path
+   * @param filePath abs path
+   * @return
+   */
+  def blameAbsPath(filePath: String): BlameResult =
+    val relativePath = PathUtil.absPathToPathInGit(filePath, repoPath)
+    util.blame(relativePath)
 }
