@@ -104,7 +104,7 @@ object GumTreeMethodFormatter {
 
   /**
    * get a packageName.className.methodName of a given node
- *
+   *
    * @param tree
    * @return Some => node in a method; None => node isn't in any method
    */
@@ -117,5 +117,17 @@ object GumTreeMethodFormatter {
     val params = GumTreeMethodFormatter.getParams(tree).orNull
     if methodName != null && className != null && packageName != null && params != null then
       Some(s"$packageName.$className.$methodName($params)")
+    else None
+
+  /**
+   * get packageName.className of a given node
+   * @param tree
+   * @return
+   */
+  def getPackageClassName(tree: Tree): Option[String] =
+    val packageName = getPackageName(tree).orNull
+    val className = getFullyClassName(tree).orNull
+    if className != null && packageName != null then
+      Some(s"$packageName.$className")
     else None
 }

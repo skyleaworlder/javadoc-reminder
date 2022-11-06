@@ -77,6 +77,12 @@ class FileDiffMetadata(
     .map(td => td.getMethods)
     .reduce((prev, curr) => prev.appendedAll(curr))
 
+  def getAllClass: Array[String] =
+    actions.filter(action => GumTreeUtil.isUnderAnyClassOrInterfaceDecl(action.getNode))
+      .map(action => GumTreeMethodFormatter.getPackageClassName(action.getNode))
+      .filter(None !=).map(oName => oName.get)
+      .distinct
+
   def getAllMethod: Array[String] =
     actions.filter(action => GumTreeUtil.isUnderAnyMethodDecl(action.getNode))
       .map(action => GumTreeUtil.getMethodDeclNodeFromDown(action.getNode))

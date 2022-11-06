@@ -72,7 +72,7 @@ object GumTreeUtil {
   def getFullyClassName(tree: Tree): Option[String] =
     val outerClasses = tree.getParents.asScala
       .filter(node => node.getType.name.equals(CLASS_OR_INTERFACE_DECLARATION))
-      .reverse
+      .reverse.toArray
     if outerClasses.nonEmpty then
       Some(outerClasses.map(getClassName)
         .reduce((prev: String, curr: String) => s"$prev$$$curr")
@@ -125,6 +125,16 @@ object GumTreeUtil {
   def isUnderAnyMethodDecl(tree: Tree): Boolean =
     if tree.getType.name.equals(METHOD_DECLARATION) then return true
     tree.getParents.asScala.exists(node => node.getType.name.equals(METHOD_DECLARATION))
+
+  /**
+   * check if given node is under a class or interface decl
+   *
+   * @param tree
+   * @return
+   */
+  def isUnderAnyClassOrInterfaceDecl(tree: Tree): Boolean =
+    if tree.getType.name.equals(CLASS_OR_INTERFACE_DECLARATION) then true
+    else tree.getParents.asScala.exists(node => node.getType.name.equals(CLASS_OR_INTERFACE_DECLARATION))
 
   /**
    * get method decl node of a node:
