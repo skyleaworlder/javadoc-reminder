@@ -18,8 +18,8 @@ class JavadocChecker extends Checker {
     val noJavadocCheckRecords = noJavadocCheck(stream)
     val paramCompletenessCheckRecords = paramCompletenessCheck(stream)
     Array.empty[Record]
-      .appendedAll(noJavadocCheck(stream))
-      .appendedAll(paramCompletenessCheck(stream))
+      .appendedAll(noJavadocCheckRecords)
+      .appendedAll(paramCompletenessCheckRecords)
 
   /**
    * check all methods in stream if it doesn't have javadoc
