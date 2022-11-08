@@ -4,7 +4,7 @@ package service.checker
 import dto.{BodyType, JRClass, JRMethod, Record, RecordType, WorkingDirDiffStore}
 
 import org.eclipse.jdt.core.dom.{MethodDeclaration, TypeDeclaration}
-import soot.SootMethod
+import soot.{Hierarchy, SootMethod}
 import soot.jimple.toolkits.callgraph.CallGraph
 
 import scala.collection.mutable
@@ -13,7 +13,8 @@ class CheckerStream(
                     val diffStore: WorkingDirDiffStore,
                     val jrClasses: Map[String, JRClass],
                     val jrMethods: Map[String, JRMethod],
-                    val callgraph: CallGraph
+                    val callgraph: CallGraph,
+                    val hierarchy: Hierarchy
                    ) {
   // contains checkers' result
   var classRecords = mutable.Map.empty[String, mutable.Map[RecordType, Record]]
