@@ -75,7 +75,7 @@ object SootUtil {
     Global.SOOT_CLASS_MAP += (sootClass.getName, sootClass)
 
     sootClass.getMethods.asScala.foreach((method: SootMethod) => {
-      Global.LOG.info(s"${SootMethodFormatter.getNameWithParams(method)} -> $method")
+      Global.LOG.debug(s"${SootMethodFormatter.getNameWithParams(method)} -> $method")
       Global.SOOT_METHOD_MAP += (s"${className}.${SootMethodFormatter.getNameWithParams(method)}" -> method)
       if !method.isPrivate then
         try method.retrieveActiveBody()

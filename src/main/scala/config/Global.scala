@@ -109,7 +109,7 @@ object Global {
     CLASS_DECLS = CLASS_DECL_MAP.values.toArray
     METHOD_DECLS = METHOD_DECL_MAP.values.toArray
 
-    println("Initialization finished")
+    LOG.info("Initialization finished")
 
   private def setClassMethodMap(m: Map[String, util.List[String]]): Unit =
     NEW_CLASSMETHOD_MAP = Map.from(m)
